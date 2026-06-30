@@ -1,0 +1,393 @@
+# Guia da linguagem Nexus
+
+Este documento descreve a sintaxe e a semântica da linguagem Nexus, conforme
+implementadas no interpretador. A linguagem é dinamicamente tipada e segue de
+perto a linguagem Lox do livro *Crafting Interpreters*.
+
+> Para a gramática formal completa, veja [grammar.md](grammar.md).
+
+## Comentários
+
+Apenas comentários de linha, iniciados por `//`:
+
+```nexus
+// Isto é um comentário e é ignorado pelo scanner.
+print "oi"; // também pode vir após código
+```
+
+Não há comentários de bloco (`/* ... */`).
+
+## Tipos de dados
+
+Nexus tem um pequeno conjunto de tipos primitivos:
+
+| Tipo | Exemplos | Representação interna (Java) |
+|------|----------|------------------------------|
+| **Número** | `1`, `42`, `3.14` | `Double` (todos os números são de ponto flutuante) |
+| **String** | `"texto"` | `String` |
+| **Booleano** | `true`, `false` | `Boolean` |
+| **Nil** | `nil` | `null` |
+
+Observações:
+
+- Todos os números são `double`. Ao imprimir, valores inteiros são exibidos sem
+  o `.0` final (ex.: `3` em vez de `3.0`), graças à função `stringify`.
+- Strings usam aspas duplas e podem abranger múltiplas linhas.
+- Não existe tipo caractere separado.
+
+## Variáveis
+
+Declare variáveis com `var`. A inicialização é opcional; sem ela, o valor é `nil`.
+
+```nexus
+var a = 10;
+var semValor;     // vale nil
+print semValor;   // imprime: nil
+
+a = a + 5;        // atribuição (reatribuição)
+print a;          // imprime: 15
+```
+
+Regras de escopo importantes (verificadas pelo **Resolver**):
+
+- Não é permitido **ler uma variável local dentro de seu próprio inicializador**
+  (ex.: `var a = a;` em escopo local gera erro).
+- Não é permitido **declarar duas variáveis com o mesmo nome no mesmo escopo
+  local**.
+
+## Operadores
+
+### Aritméticos
+
+| Operador | Significado | Observação |
+|----------|-------------|------------|
+| `+` | Soma / concatenação | Funciona com dois números **ou** duas strings |
+| `-` | Subtração / negação unária | |
+| `*` | Multiplicação | |
+| `/` | Divisão | |
+
+```nexus
+print 2 + 3;            // 5
+print "foo" + "bar";    // foobar
+print -5;               // -5
+```
+
+> O operador `+` exige **dois números** ou **duas strings**. Misturar tipos
+> (ex.: `"x" + 1`) gera erro de execução: *"Operands must be two numbers or two strings."*
+
+### Comparação e igualdade
+
+| Operador | Significado |
+|----------|-------------|
+| `==` | Igual |
+| `!=` | Diferente |
+| `>` | Maior |
+| `>=` | Maior ou igual |
+| `<` | Menor |
+| `<=` | Menor ou igual |
+
+```nexus
+print 1 < 2;        // true
+print 3 == 3;       // true
+print "a" == "a";   // true
+print nil == nil;   // true
+```
+
+> Os operadores relacionais (`>`, `>=`, `<`, `<=`) exigem **números** em ambos
+> os lados. Já `==` e `!=` funcionam entre quaisquer valores.
+
+### Lógicos
+
+| Operador | Significado | Curto-circuito |
+|----------|-------------|----------------|
+| `and` | E lógico | Retorna o operando esquerdo se ele for "falso", senão o direito |
+| `or` | OU lógico | Retorna o operando esquerdo se ele for "verdadeiro", senão o direito |
+| `!` | NÃO lógico (unário) | |
+
+```nexus
+print true and false;   // false
+print nil or "padrão";  // padrão
+print !true;            // false
+```
+
+### Regra de veracidade (*truthiness*)
+
+Em contextos booleanos (condições de `if`, `while`, operadores lógicos):
+
+- `false` e `nil` são considerados **falsos**.
+- **Todo o resto** (incluindo `0` e strings vazias) é considerado **verdadeiro**.
+
+## Controle de fluxo
+
+### `if` / `else`
+
+```nexus
+if (condicao) {
+  print "verdadeiro";
+} else {
+  print "falso";
+}
+```
+
+As chaves são opcionais quando o corpo é um único comando, mas recomendadas.
+
+### `while`
+
+```nexus
+var i = 0;
+while (i < 3) {
+  print i;
+  i = i + 1;
+}
+```
+
+### `for`
+
+```nexus
+for (var i = 0; i < 3; i = i + 1) {
+  print i;
+}
+```
+
+Internamente, o `for` é "açúcar sintático": o parser o transforma em um `while`
+com inicializador e incremento (ver `forStatement` em `Parser.java`). Todas as
+três cláusulas (inicializador, condição, incremento) são opcionais.
+
+> Não existem comandos `break` ou `continue` na linguagem.
+
+## Blocos e escopo
+
+Um bloco `{ ... }` cria um novo escopo léxico. Variáveis declaradas dentro dele
+não vazam para fora:
+
+```nexus
+var x = "global";
+{
+  var x = "local";
+  print x;   // local
+}
+print x;     // global
+```
+
+## `print`
+
+`print` é um **comando embutido da linguagem** (não uma função). Avalia uma
+expressão e imprime o resultado seguido de uma quebra de linha:
+
+```nexus
+print 1 + 1;     // 2
+print "texto";   // texto
+```
+
+## Funções
+
+Funções são declaradas com `fun`:
+
+```nexus
+fun saudacao(nome) {
+  print "Olá, " + nome + "!";
+}
+
+saudacao("Mundo");   // Olá, Mundo!
+```
+
+### Retorno de valores
+
+```nexus
+fun soma(a, b) {
+  return a + b;
+}
+
+print soma(3, 4);   // 7
+```
+
+- Uma função sem `return`, ou com `return;` sem valor, retorna `nil`.
+- `return` no nível superior do programa (fora de qualquer função) é um erro,
+  detectado pelo Resolver.
+
+### Closures
+
+Funções capturam o ambiente onde foram definidas (escopo léxico), formando
+*closures*:
+
+```nexus
+fun contador() {
+  var i = 0;
+  fun incrementa() {
+    i = i + 1;
+    return i;
+  }
+  return incrementa;
+}
+
+var c = contador();
+print c();   // 1
+print c();   // 2
+print c();   // 3
+```
+
+### Limites
+
+- Uma função/método pode ter no máximo **255 parâmetros**, e uma chamada no
+  máximo **255 argumentos** (limites verificados pelo Parser).
+- O número de argumentos em uma chamada deve bater exatamente com a aridade
+  (*arity*) da função, senão ocorre erro de execução.
+
+## Função nativa: `clock`
+
+O interpretador registra uma única função nativa no escopo global: `clock()`.
+Ela retorna o tempo atual em segundos (como número de ponto flutuante), útil
+para medir desempenho:
+
+```nexus
+var inicio = clock();
+// ... algum trabalho ...
+print clock() - inicio;   // tempo decorrido em segundos
+```
+
+## Programação orientada a objetos
+
+### Classes e métodos
+
+```nexus
+class Pessoa {
+  saudar() {
+    print "Olá!";
+  }
+}
+
+var p = Pessoa();   // cria uma instância (chamando a classe como função)
+p.saudar();         // Olá!
+```
+
+### Campos
+
+Campos (atributos) são criados dinamicamente por atribuição, usando a notação
+de ponto:
+
+```nexus
+var p = Pessoa();
+p.nome = "Ana";     // cria/define o campo
+print p.nome;       // Ana
+```
+
+> Acessar um campo/propriedade inexistente gera erro:
+> *"Undefined property 'x'."*
+
+### `this`
+
+Dentro de um método, `this` refere-se à instância sobre a qual o método foi
+chamado:
+
+```nexus
+class Pessoa {
+  init(nome) {
+    this.nome = nome;
+  }
+
+  saudar() {
+    print "Olá, eu sou " + this.nome;
+  }
+}
+
+var p = Pessoa("Ana");
+p.saudar();   // Olá, eu sou Ana
+```
+
+Usar `this` fora de uma classe é um erro detectado pelo Resolver.
+
+### Construtor `init`
+
+O método especial `init` é o **construtor**. Ele é chamado automaticamente
+quando a classe é instanciada, e os argumentos passados à classe vão para ele:
+
+```nexus
+class Ponto {
+  init(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+var ponto = Ponto(3, 4);
+print ponto.x;   // 3
+```
+
+Regras do `init`:
+
+- A aridade da classe (número de argumentos esperados ao instanciar) é a aridade
+  do `init`.
+- `init` sempre retorna a própria instância. Um `return;` sem valor é permitido
+  (retorna `this`), mas `return <valor>;` dentro de `init` é um **erro**.
+
+### Herança
+
+Use `<` para herdar de uma superclasse:
+
+```nexus
+class Animal {
+  falar() {
+    print "...";
+  }
+}
+
+class Cachorro < Animal {
+  falar() {
+    print "Au au!";
+  }
+}
+
+Cachorro().falar();   // Au au!
+```
+
+Regras de herança:
+
+- A superclasse precisa ser realmente uma classe (senão: *"Superclass must be a class."*).
+- Uma classe **não pode herdar de si mesma** (erro detectado pelo Resolver).
+
+### `super`
+
+`super` permite invocar um método da superclasse a partir da subclasse:
+
+```nexus
+class Animal {
+  falar() {
+    print "Som genérico";
+  }
+}
+
+class Gato < Animal {
+  falar() {
+    super.falar();        // chama o método da superclasse
+    print "Miau";
+  }
+}
+
+Gato().falar();
+// Som genérico
+// Miau
+```
+
+Regras de `super`:
+
+- Só pode ser usado **dentro de uma classe** que tenha superclasse.
+- Usá-lo fora de uma classe, ou em uma classe sem superclasse, é um erro
+  detectado pelo Resolver.
+
+## Tratamento de erros
+
+Há dois grandes momentos em que erros podem ocorrer:
+
+1. **Erros estáticos** (sintaxe e análise de escopo): detectados pelo Parser e
+   pelo Resolver antes da execução. Exemplos: `;` faltando, `return` no topo,
+   `this` fora de classe. Mostram a linha e encerram com código 65.
+2. **Erros de execução** (*runtime*): detectados pelo Interpreter. Exemplos:
+   operandos de tipo errado, chamar algo que não é função, propriedade
+   inexistente. Mostram a mensagem e a linha, e encerram com código 70.
+
+Exemplo de mensagem de erro de runtime:
+
+```
+Operands must be numbers.
+[line 3]
+```
