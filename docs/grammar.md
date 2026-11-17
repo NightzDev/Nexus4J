@@ -10,8 +10,9 @@ Os tipos de token estão definidos no enum `TokenType` (`TokenType.java`).
 ### Tokens de caractere único
 
 ```
-( )   LEFT_PAREN  RIGHT_PAREN
-{ }   LEFT_BRACE  RIGHT_BRACE
+( )   LEFT_PAREN    RIGHT_PAREN
+{ }   LEFT_BRACE    RIGHT_BRACE
+[ ]   LEFT_BRACKET  RIGHT_BRACKET
 ,     COMMA
 .     DOT
 -     MINUS
@@ -131,7 +132,9 @@ forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
 ```ebnf
 expression     → assignment ;
 
-assignment     → ( call "." )? IDENTIFIER "=" assignment
+assignment     → ( call "." IDENTIFIER
+                 | call "[" expression "]"
+                 | IDENTIFIER ) "=" assignment
                | logic_or ;
 
 logic_or       → logic_and ( "or" logic_and )* ;
@@ -149,13 +152,18 @@ factor         → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | call ;
 
-call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
+call           → primary ( "(" arguments? ")"
+                          | "." IDENTIFIER
+                          | "[" expression "]" )* ;
 
 arguments      → expression ( "," expression )* ;
+
+array          → "[" ( expression ( "," expression )* )? "]" ;
 
 primary        → "true" | "false" | "nil"
                | NUMBER | STRING
                | "(" expression ")"
+               | array
                | IDENTIFIER
                | "this"
                | "super" "." IDENTIFIER ;
@@ -173,7 +181,7 @@ primary        → "true" | "false" | "nil"
 | 6 | `+` `-` | à esquerda |
 | 7 | `*` `/` | à esquerda |
 | 8 | `!` `-` (unários) | à direita |
-| 9 (mais forte) | `()` chamada, `.` acesso | à esquerda |
+| 9 (mais forte) | `()` chamada, `.` acesso, `[]` indexação | à esquerda |
 
 ## Recuperação de erros
 

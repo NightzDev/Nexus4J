@@ -73,8 +73,12 @@ public class Nexus {
     }
 
     static void runtimeError(RuntimeError error) {
-        System.err.println(error.getMessage() +
-                "\n[line " + error.token.line + "]");
+        if (error.token != null) {
+            System.err.println(error.getMessage() +
+                    "\n[line " + error.token.line + "]");
+        } else {
+            System.err.println(error.getMessage());
+        }
         hadRuntimeError = true;
     }
 

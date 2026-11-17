@@ -1,0 +1,42 @@
+// Exemplo de uso de listas no Nexus.
+// Execute com:
+//   java -cp target/classes org.example.Nexus examples/lists.nxs
+
+// Literal de lista e impressao.
+var frutas = ["apple", "banana", "grape"];
+print frutas;              // [apple, banana, grape]
+
+// Acesso por indice (base 0).
+print frutas[0];           // apple
+print frutas[2];           // grape
+
+// Atribuicao por indice.
+frutas[1] = "mango";
+print frutas;              // [apple, mango, grape]
+
+// Tamanho com a funcao nativa len (serve para listas e strings).
+print len(frutas);         // 3
+print len("nexus");        // 5
+
+// append adiciona ao fim (muta a lista).
+append(frutas, "pear");
+print frutas;              // [apple, mango, grape, pear]
+
+// remove retira pelo indice e devolve o elemento removido.
+var removida = remove(frutas, 0);
+print removida;            // apple
+print frutas;              // [mango, grape, pear]
+
+// Listas podem conter qualquer valor, inclusive outras listas.
+var matriz = [[1, 2], [3, 4]];
+print matriz[1][0];        // 3
+
+// Percorrendo uma lista com um laço.
+fun soma(lista) {
+  var total = 0;
+  for (var i = 0; i < len(lista); i = i + 1) {
+    total = total + lista[i];
+  }
+  return total;
+}
+print soma([10, 20, 30]);  // 60

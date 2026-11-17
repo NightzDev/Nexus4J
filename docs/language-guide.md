@@ -27,6 +27,7 @@ Nexus tem um pequeno conjunto de tipos primitivos:
 | **String** | `"texto"` | `String` |
 | **Booleano** | `true`, `false` | `Boolean` |
 | **Nil** | `nil` | `null` |
+| **Lista** | `[1, 2, 3]` | `java.util.List` |
 
 Observações:
 
@@ -232,6 +233,68 @@ print c();   // 3
   máximo **255 argumentos** (limites verificados pelo Parser).
 - O número de argumentos em uma chamada deve bater exatamente com a aridade
   (*arity*) da função, senão ocorre erro de execução.
+
+## Listas
+
+Listas são sequências ordenadas e mutáveis de valores, escritas entre colchetes:
+
+```nexus
+var nums = [1, 2, 3];
+var vazia = [];
+var mista = [1, "dois", true, nil, [9, 8]];   // pode misturar tipos e aninhar
+```
+
+### Acesso e atribuição por índice
+
+Os índices são de **base 0**. Use colchetes para ler ou escrever um elemento:
+
+```nexus
+var nums = [10, 20, 30];
+print nums[0];      // 10
+nums[1] = 99;
+print nums;         // [10, 99, 30]
+```
+
+O índice pode ser qualquer expressão que resulte em um número inteiro:
+
+```nexus
+var i = 1;
+print [100, 200, 300][i + 1];   // 300
+```
+
+Erros de índice são detectados em tempo de execução:
+
+| Situação | Mensagem |
+|----------|----------|
+| Índice fora do intervalo | *"List index out of range."* |
+| Índice não inteiro (ex.: `1.5`) | *"List index must be an integer."* |
+| Índice não numérico | *"List index must be a number."* |
+| Indexar algo que não é lista | *"Only lists can be indexed."* |
+
+### Funções nativas para listas
+
+| Função | Aridade | Descrição |
+|--------|---------|-----------|
+| `len(x)` | 1 | Tamanho de uma lista **ou** de uma string. |
+| `append(lista, valor)` | 2 | Adiciona `valor` ao fim da lista (muta a lista). Retorna `nil`. |
+| `remove(lista, indice)` | 2 | Remove e **retorna** o elemento no índice informado. |
+
+```nexus
+var l = [1, 2, 3];
+print len(l);        // 3
+
+append(l, 4);
+print l;             // [1, 2, 3, 4]
+
+var x = remove(l, 0);
+print x;             // 1
+print l;             // [2, 3, 4]
+```
+
+> As listas são **mutáveis e passadas por referência**: passar uma lista para
+> uma função e chamar `append`/`remove` dentro dela altera a lista original.
+
+Um exemplo completo está em `examples/lists.nxs`.
 
 ## Função nativa: `clock`
 

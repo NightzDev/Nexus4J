@@ -18,6 +18,10 @@ public class GenerateAst {
                 "Call     : Expr callee, Token paren, List<Expr> arguments",
                 "Get      : Expr object, Token name",
                 "Set      : Expr object, Token name, Expr value",
+                "Array    : Token bracket, List<Expr> elements",
+                "Index    : Expr object, Token bracket, Expr index",
+                "IndexSet : Expr object, Token bracket, Expr index," +
+                        " Expr value",
                 "Super    : Token keyword, Token method",
                 "This     : Token keyword",
                 "Grouping : Expr expression",

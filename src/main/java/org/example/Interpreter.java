@@ -26,6 +26,69 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             @Override
             public String toString() { return "<native fn>"; }
         });
+
+        globals.define("len", new NexusCallable() {
+            @Override
+            public int arity() { return 1; }
+
+            @Override
+            public Object call(Interpreter interpreter,
+                               List<Object> arguments) {
+                Object arg = arguments.get(0);
+                if (arg instanceof List) {
+                    return (double)((List<Object>)arg).size();
+                }
+                if (arg instanceof String) {
+                    return (double)((String)arg).length();
+                }
+                throw new RuntimeError(null,
+                        "Argument to 'len' must be a list or string.");
+            }
+
+            @Override
+            public String toString() { return "<native fn>"; }
+        });
+
+        globals.define("append", new NexusCallable() {
+            @Override
+            public int arity() { return 2; }
+
+            @Override
+            public Object call(Interpreter interpreter,
+                               List<Object> arguments) {
+                Object arg = arguments.get(0);
+                if (!(arg instanceof List)) {
+                    throw new RuntimeError(null,
+                            "First argument to 'append' must be a list.");
+                }
+                ((List<Object>)arg).add(arguments.get(1));
+                return null;
+            }
+
+            @Override
+            public String toString() { return "<native fn>"; }
+        });
+
+        globals.define("remove", new NexusCallable() {
+            @Override
+            public int arity() { return 2; }
+
+            @Override
+            public Object call(Interpreter interpreter,
+                               List<Object> arguments) {
+                Object arg = arguments.get(0);
+                if (!(arg instanceof List)) {
+                    throw new RuntimeError(null,
+                            "First argument to 'remove' must be a list.");
+                }
+                List<Object> list = (List<Object>)arg;
+                int index = checkIndex(null, arguments.get(1), list.size());
+                return list.remove(index);
+            }
+
+            @Override
+            public String toString() { return "<native fn>"; }
+        });
     }
 
     void interpret(List<Stmt> statements) {
@@ -155,6 +218,17 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 text = text.substring(0, text.length() - 2);
             }
             return text;
+        }
+
+        if (object instanceof List) {
+            List<Object> list = (List<Object>)object;
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(stringify(list.get(i)));
+            }
+            sb.append("]");
+            return sb.toString();
         }
 
         return object.toString();
@@ -375,6 +449,62 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         throw new RuntimeError(expr.name,
                 "Only instances have properties.");
+    }
+
+    @Override
+    public Object visitArrayExpr(Expr.Array expr) {
+        List<Object> elements = new ArrayList<>();
+        for (Expr element : expr.elements) {
+            elements.add(evaluate(element));
+        }
+        return elements;
+    }
+
+    @Override
+    public Object visitIndexExpr(Expr.Index expr) {
+        Object object = evaluate(expr.object);
+        Object indexValue = evaluate(expr.index);
+
+        if (object instanceof List) {
+            List<Object> list = (List<Object>)object;
+            int index = checkIndex(expr.bracket, indexValue, list.size());
+            return list.get(index);
+        }
+
+        throw new RuntimeError(expr.bracket, "Only lists can be indexed.");
+    }
+
+    @Override
+    public Object visitIndexSetExpr(Expr.IndexSet expr) {
+        Object object = evaluate(expr.object);
+
+        if (!(object instanceof List)) {
+            throw new RuntimeError(expr.bracket,
+                    "Only lists can be indexed.");
+        }
+
+        Object indexValue = evaluate(expr.index);
+        List<Object> list = (List<Object>)object;
+        int index = checkIndex(expr.bracket, indexValue, list.size());
+        Object value = evaluate(expr.value);
+        list.set(index, value);
+        return value;
+    }
+
+    private int checkIndex(Token bracket, Object indexValue, int size) {
+        if (!(indexValue instanceof Double)) {
+            throw new RuntimeError(bracket, "List index must be a number.");
+        }
+        double d = (double)indexValue;
+        if (d != Math.floor(d) || Double.isInfinite(d)) {
+            throw new RuntimeError(bracket,
+                    "List index must be an integer.");
+        }
+        int index = (int)d;
+        if (index < 0 || index >= size) {
+            throw new RuntimeError(bracket, "List index out of range.");
+        }
+        return index;
     }
 
 }

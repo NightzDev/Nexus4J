@@ -32,11 +32,15 @@ Pequenos defeitos e resquícios já resolvidos:
 
 Em ordem sugerida de implementação (do mais impactante ao complementar):
 
-- [ ] **Coleções**: listas e mapas/dicionários, com sintaxe literal e operações
-  básicas. É a maior limitação atual.
+- [x] **Listas**: literais `[...]`, indexação para leitura e escrita `l[i]`,
+  com verificação de limites. Veja `examples/lists.nxs` e o
+  [language-guide.md](language-guide.md#listas).
+- [ ] **Mapas / dicionários**: coleção associativa chave→valor.
 - [ ] **Biblioteca padrão** além de `clock()`:
+  - [x] `len(x)` — tamanho de lista ou string.
+  - [x] `append(lista, valor)` e `remove(lista, indice)`.
   - [ ] Entrada do usuário (ex.: `input()` / `read()`).
-  - [ ] Funções de string (tamanho, substring, busca).
+  - [ ] Funções de string (substring, busca).
   - [ ] Matemática (`sqrt`, `abs`, `floor`, `ceil`, ...).
   - [ ] Conversões de tipo (`str`, `num`).
 - [ ] **Operador de módulo `%`** (e, opcionalmente, divisão inteira).
@@ -67,5 +71,5 @@ Em ordem sugerida de implementação (do mais impactante ao complementar):
 | Nível | Objetivo | Estado |
 |-------|----------|--------|
 | 1 | Igualar e consertar a base do livro | ✅ Concluído |
-| 2 | Virar linguagem usável de verdade | ⬜ Pendente (prioridade: coleções + stdlib + `break`/`continue`) |
+| 2 | Virar linguagem usável de verdade | 🟡 Em andamento (listas + `len`/`append`/`remove` prontos; faltam mapas, mais stdlib, `break`/`continue`) |
 | 3 | Qualidade, build e automação | ⬜ Pendente |

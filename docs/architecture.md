@@ -60,8 +60,10 @@ execução); a quarta é a execução propriamente dita.
   corresponde a uma regra da gramática e codifica a precedência dos operadores.
   Também faz recuperação de erros via `synchronize()`.
 - **`Expr.java`** define os nós de **expressão** da AST. Subclasses:
-  `Assign`, `Binary`, `Call`, `Get`, `Set`, `Super`, `This`, `Grouping`,
-  `Literal`, `Logical`, `Unary`, `Variable`.
+  `Assign`, `Binary`, `Call`, `Get`, `Set`, `Array`, `Index`, `IndexSet`,
+  `Super`, `This`, `Grouping`, `Literal`, `Logical`, `Unary`, `Variable`.
+  (`Array` é o literal de lista `[...]`, `Index` é a leitura `l[i]` e
+  `IndexSet` é a atribuição `l[i] = v`.)
 - **`Stmt.java`** define os nós de **comando/declaração** da AST. Subclasses:
   `Block`, `Class`, `Expression`, `If`, `Function`, `Print`, `Return`, `Var`,
   `While`.
@@ -173,11 +175,16 @@ operações sobre a árvore sem tocar nas classes dos nós.
 O que falta para a linguagem evoluir está organizado em uma lista priorizada no
 [roadmap.md](roadmap.md). Em resumo, como implementação no estilo *jlox* a
 linguagem está completa; o que falta para ser uma linguagem de uso real são
-recursos além do livro:
+recursos além do livro. Já implementado:
 
-- **Coleções** (listas e mapas) — a maior limitação atual.
-- **Biblioteca padrão** mais ampla (além de `clock`): entrada do usuário,
-  funções de string, matemática, conversões de tipo.
+- **Listas** com literais `[...]`, indexação para leitura/escrita e as funções
+  nativas `len`, `append` e `remove`.
+
+Ainda pendente:
+
+- **Mapas / dicionários** e demais coleções.
+- **Biblioteca padrão** mais ampla (além de `clock` e das funções de lista):
+  entrada do usuário, funções de string, matemática, conversões de tipo.
 - **`break` / `continue`**, operador de módulo `%`, escapes em strings
   (`\n`, `\t`, `\"`) e comentários de bloco.
 - **Testes automatizados** e empacotamento em um JAR executável.

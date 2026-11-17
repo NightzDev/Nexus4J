@@ -218,6 +218,10 @@ class Parser {
             }else if (expr instanceof Expr.Get) {
                 Expr.Get get = (Expr.Get)expr;
                 return new Expr.Set(get.object, get.name, value);
+            }else if (expr instanceof Expr.Index) {
+                Expr.Index index = (Expr.Index)expr;
+                return new Expr.IndexSet(index.object, index.bracket,
+                        index.index, value);
             }
 
             error(equals, "Invalid assignment target.");
@@ -335,6 +339,11 @@ class Parser {
                 Token name = consume(IDENTIFIER,
                         "Expect property name after '.'.");
                 expr = new Expr.Get(expr, name);
+            } else if (match(LEFT_BRACKET)) {
+                Token bracket = previous();
+                Expr index = expression();
+                consume(RIGHT_BRACKET, "Expect ']' after index.");
+                expr = new Expr.Index(expr, bracket, index);
             } else {
                 break;
             }
@@ -366,12 +375,31 @@ class Parser {
             return new Expr.Variable(previous());
         }
 
+        if (match(LEFT_BRACKET)) {
+            return arrayLiteral(previous());
+        }
+
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
         throw error(peek(), "Expect expression.");
+    }
+
+    private Expr arrayLiteral(Token bracket) {
+        List<Expr> elements = new ArrayList<>();
+        if (!check(RIGHT_BRACKET)) {
+            do {
+                if (elements.size() >= 255) {
+                    error(peek(),
+                            "Can't have more than 255 elements in a list.");
+                }
+                elements.add(expression());
+            } while (match(COMMA));
+        }
+        consume(RIGHT_BRACKET, "Expect ']' after list elements.");
+        return new Expr.Array(bracket, elements);
     }
 
     private Token consume(TokenType type, String message) {

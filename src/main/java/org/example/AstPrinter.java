@@ -42,6 +42,23 @@ class AstPrinter implements Expr.Visitor<String> {
     }
 
     @Override
+    public String visitArrayExpr(Expr.Array expr) {
+        return parenthesize("list",
+                expr.elements.toArray(new Expr[0]));
+    }
+
+    @Override
+    public String visitIndexExpr(Expr.Index expr) {
+        return parenthesize("index", expr.object, expr.index);
+    }
+
+    @Override
+    public String visitIndexSetExpr(Expr.IndexSet expr) {
+        return parenthesize("index-set",
+                expr.object, expr.index, expr.value);
+    }
+
+    @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
         return parenthesize("group", expr.expression);
     }

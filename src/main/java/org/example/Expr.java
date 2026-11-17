@@ -9,6 +9,9 @@ abstract class Expr {
     R visitCallExpr(Call expr);
     R visitGetExpr(Get expr);
     R visitSetExpr(Set expr);
+    R visitArrayExpr(Array expr);
+    R visitIndexExpr(Index expr);
+    R visitIndexSetExpr(IndexSet expr);
     R visitSuperExpr(Super expr);
     R visitThisExpr(This expr);
     R visitGroupingExpr(Grouping expr);
@@ -91,6 +94,54 @@ abstract class Expr {
 
     final Expr object;
     final Token name;
+    final Expr value;
+  }
+  static class Array extends Expr {
+    Array(Token bracket, List<Expr> elements) {
+      this.bracket = bracket;
+      this.elements = elements;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitArrayExpr(this);
+    }
+
+    final Token bracket;
+    final List<Expr> elements;
+  }
+  static class Index extends Expr {
+    Index(Expr object, Token bracket, Expr index) {
+      this.object = object;
+      this.bracket = bracket;
+      this.index = index;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitIndexExpr(this);
+    }
+
+    final Expr object;
+    final Token bracket;
+    final Expr index;
+  }
+  static class IndexSet extends Expr {
+    IndexSet(Expr object, Token bracket, Expr index, Expr value) {
+      this.object = object;
+      this.bracket = bracket;
+      this.index = index;
+      this.value = value;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitIndexSetExpr(this);
+    }
+
+    final Expr object;
+    final Token bracket;
+    final Expr index;
     final Expr value;
   }
   static class Super extends Expr {
