@@ -1,7 +1,5 @@
 package org.example;
 
-import com.sun.tools.javac.Main;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +20,9 @@ class Scanner {
     static {
         keywords = new HashMap<>();
         keywords.put("and",    AND);
+        keywords.put("break",  BREAK);
         keywords.put("class",  CLASS);
+        keywords.put("continue", CONTINUE);
         keywords.put("else",   ELSE);
         keywords.put("false",  FALSE);
         keywords.put("for",    FOR);
@@ -61,6 +61,8 @@ class Scanner {
             case ')': addToken(RIGHT_PAREN); break;
             case '{': addToken(LEFT_BRACE); break;
             case '}': addToken(RIGHT_BRACE); break;
+            case '[': addToken(LEFT_BRACKET); break;
+            case ']': addToken(RIGHT_BRACKET); break;
             case ',': addToken(COMMA); break;
             case '.': addToken(DOT); break;
             case '-': addToken(MINUS); break;
@@ -103,7 +105,7 @@ class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    //Nexus.error(line, "Unexpected character.");
+                    Nexus.error(line, "Unexpected character.");
                 }
         }
     }
@@ -138,7 +140,7 @@ class Scanner {
         }
 
         if (isAtEnd()) {
-            //Nexus.error(line, "Unterminated string.");
+            Nexus.error(line, "Unterminated string.");
             return;
         }
 

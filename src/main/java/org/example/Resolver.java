@@ -150,6 +150,29 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitArrayExpr(Expr.Array expr) {
+        for (Expr element : expr.elements) {
+            resolve(element);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitIndexExpr(Expr.Index expr) {
+        resolve(expr.object);
+        resolve(expr.index);
+        return null;
+    }
+
+    @Override
+    public Void visitIndexSetExpr(Expr.IndexSet expr) {
+        resolve(expr.object);
+        resolve(expr.index);
+        resolve(expr.value);
+        return null;
+    }
+
+    @Override
     public Void visitLiteralExpr(Expr.Literal expr) {
         return null;
     }
@@ -202,6 +225,17 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitWhileStmt(Stmt.While stmt) {
         resolve(stmt.condition);
         resolve(stmt.body);
+        if (stmt.increment != null) resolve(stmt.increment);
+        return null;
+    }
+
+    @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        return null;
+    }
+
+    @Override
+    public Void visitContinueStmt(Stmt.Continue stmt) {
         return null;
     }
 

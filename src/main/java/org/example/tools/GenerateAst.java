@@ -7,17 +7,21 @@ import java.util.List;
 
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
-        //if (args.length != 1) {
-        //    System.err.println("Usage: generate_ast <output directory>");
-        //    System.exit(64);
-        //}
-        String outputDir = "C:\\Users\\yurih\\Documents\\A2\\Event\\src\\main\\java\\org\\example\\";
+        if (args.length != 1) {
+            System.err.println("Usage: generate_ast <output directory>");
+            System.exit(64);
+        }
+        String outputDir = args[0];
         defineAst(outputDir, "Expr", Arrays.asList(
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
                 "Call     : Expr callee, Token paren, List<Expr> arguments",
                 "Get      : Expr object, Token name",
                 "Set      : Expr object, Token name, Expr value",
+                "Array    : Token bracket, List<Expr> elements",
+                "Index    : Expr object, Token bracket, Expr index",
+                "IndexSet : Expr object, Token bracket, Expr index," +
+                        " Expr value",
                 "Super    : Token keyword, Token method",
                 "This     : Token keyword",
                 "Grouping : Expr expression",
@@ -38,7 +42,10 @@ public class GenerateAst {
                 "Print      : Expr expression",
                 "Return     : Token keyword, Expr value",
                 "Var        : Token name, Expr initializer",
-                "While      : Expr condition, Stmt body"
+                "While      : Expr condition, Stmt body," +
+                        " Stmt increment",
+                "Break      : Token keyword",
+                "Continue   : Token keyword"
         ));
 
     }
