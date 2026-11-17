@@ -134,9 +134,33 @@ class Scanner {
     }
 
     private void string() {
+        StringBuilder value = new StringBuilder();
+
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') line++;
-            advance();
+            char c = peek();
+            if (c == '\\') {
+                advance(); // consume the backslash
+                if (isAtEnd()) break;
+                char esc = advance();
+                switch (esc) {
+                    case 'n':  value.append('\n'); break;
+                    case 't':  value.append('\t'); break;
+                    case 'r':  value.append('\r'); break;
+                    case '"':  value.append('"');  break;
+                    case '\\': value.append('\\'); break;
+                    case '0':  value.append('\0'); break;
+                    case '\n':
+                        // A backslash before a real newline: line continuation.
+                        line++;
+                        break;
+                    default:
+                        Nexus.error(line,
+                                "Invalid escape sequence '\\" + esc + "'.");
+                }
+            } else {
+                if (c == '\n') line++;
+                value.append(advance());
+            }
         }
 
         if (isAtEnd()) {
@@ -147,9 +171,7 @@ class Scanner {
         // The closing ".
         advance();
 
-        // Trim the surrounding quotes.
-        String value = source.substring(start + 1, current - 1);
-        addToken(STRING, value);
+        addToken(STRING, value.toString());
     }
 
     private boolean match(char expected) {

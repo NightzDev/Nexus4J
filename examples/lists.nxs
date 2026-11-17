@@ -2,30 +2,30 @@
 // Execute com:
 //   java -cp target/classes org.example.Nexus examples/lists.nxs
 
-// Literal de lista e impressao.
-var frutas = ["apple", "banana", "grape"];
-print frutas;              // [apple, banana, grape]
+// Literal de lista e impressão.
+var frutas = ["maçã", "banana", "uva"];
+print frutas;              // [maçã, banana, uva]
 
-// Acesso por indice (base 0).
-print frutas[0];           // apple
-print frutas[2];           // grape
+// Acesso por índice (base 0).
+print frutas[0];           // maçã
+print frutas[2];           // uva
 
-// Atribuicao por indice.
-frutas[1] = "mango";
-print frutas;              // [apple, mango, grape]
+// Atribuição por índice.
+frutas[1] = "manga";
+print frutas;              // [maçã, manga, uva]
 
-// Tamanho com a funcao nativa len (serve para listas e strings).
+// Tamanho com a função nativa len (serve para listas e strings).
 print len(frutas);         // 3
 print len("nexus");        // 5
 
 // append adiciona ao fim (muta a lista).
-append(frutas, "pear");
-print frutas;              // [apple, mango, grape, pear]
+append(frutas, "pêra");
+print frutas;              // [maçã, manga, uva, pêra]
 
-// remove retira pelo indice e devolve o elemento removido.
+// remove retira pelo índice e devolve o elemento removido.
 var removida = remove(frutas, 0);
-print removida;            // apple
-print frutas;              // [mango, grape, pear]
+print removida;            // maçã
+print frutas;              // [manga, uva, pêra]
 
 // Listas podem conter qualquer valor, inclusive outras listas.
 var matriz = [[1, 2], [3, 4]];

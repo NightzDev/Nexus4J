@@ -184,14 +184,15 @@ recursos além do livro. Já implementado:
 - **Listas** com literais `[...]`, indexação para leitura/escrita e as funções
   nativas `len`, `append` e `remove`.
 - **`break` e `continue`** em laços, com verificação estática de uso fora de laço.
+- **Sequências de escape em strings** (`\n`, `\t`, `\r`, `\"`, `\\`, `\0`) e
+  leitura/saída em **UTF-8**.
 
 Ainda pendente:
 
 - **Mapas / dicionários** e demais coleções.
 - **Biblioteca padrão** mais ampla (além de `clock` e das funções de lista):
   entrada do usuário, funções de string, matemática, conversões de tipo.
-- **Operador de módulo `%`**, escapes em strings (`\n`, `\t`, `\"`) e
-  comentários de bloco.
+- **Operador de módulo `%`** e comentários de bloco.
 - **Testes automatizados** e empacotamento em um JAR executável.
 
 Veja o [roadmap.md](roadmap.md) para a lista completa e a ordem sugerida.

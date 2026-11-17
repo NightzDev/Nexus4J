@@ -1,0 +1,25 @@
+// Exemplo de strings e sequências de escape no Nexus.
+// Execute com:
+//   java -cp target/classes org.example.Nexus examples/strings.nxs
+
+// Acentos funcionam (arquivos e saída são tratados como UTF-8).
+print "Olá, açúcar e coração!";
+
+// Quebra de linha com \n.
+print "primeira linha\nsegunda linha";
+
+// Tabulação com \t.
+print "nome:\tNexus";
+
+// Aspas dentro da string com \".
+print "ele disse \"oi\"";
+
+// Barra invertida literal com \\.
+print "caminho: a\\b\\c";
+
+// Concatenação de strings com +.
+var nome = "Nexus";
+print "linguagem: " + nome;
+
+// len conta caracteres; cada escape vira um único caractere.
+print len("a\nb");    // 3

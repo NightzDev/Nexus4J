@@ -36,6 +36,33 @@ Observações:
 - Strings usam aspas duplas e podem abranger múltiplas linhas.
 - Não existe tipo caractere separado.
 
+### Sequências de escape em strings
+
+Dentro de uma string, a barra invertida inicia uma sequência de escape:
+
+| Escape | Significado |
+|--------|-------------|
+| `\n` | Quebra de linha |
+| `\t` | Tabulação |
+| `\r` | Retorno de carro |
+| `\"` | Aspas duplas (sem encerrar a string) |
+| `\\` | Barra invertida literal |
+| `\0` | Caractere nulo |
+
+```nexus
+print "primeira\nsegunda";   // duas linhas
+print "ele disse \"oi\"";    // ele disse "oi"
+print "caminho: a\\b";       // caminho: a\b
+```
+
+Uma sequência de escape desconhecida (ex.: `\q`) é um erro de sintaxe:
+*"Invalid escape sequence '\q'."*
+
+> **Codificação:** arquivos de script e a saída do programa são tratados como
+> **UTF-8**, independentemente do sistema. Por isso acentos e outros caracteres
+> Unicode (ex.: `"maçã"`, `"coração"`) funcionam normalmente. Veja
+> `examples/strings.nxs`.
+
 ## Variáveis
 
 Declare variáveis com `var`. A inicialização é opcional; sem ela, o valor é `nil`.

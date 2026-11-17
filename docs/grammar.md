@@ -66,7 +66,9 @@ EOF    marca o fim da entrada
 - **Números**: uma sequência de dígitos, opcionalmente com uma parte
   fracionária (`.` seguido de mais dígitos). Não há sinal nem notação
   científica no léxico — o sinal de menos é tratado como operador unário.
-- **Strings**: tudo entre aspas duplas; podem conter quebras de linha.
+- **Strings**: tudo entre aspas duplas; podem conter quebras de linha e
+  sequências de escape (`\n`, `\t`, `\r`, `\"`, `\\`, `\0`). O código-fonte é
+  lido como UTF-8.
 
 ## Gramática (notação EBNF)
 

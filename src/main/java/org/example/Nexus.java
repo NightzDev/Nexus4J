@@ -3,7 +3,8 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,6 +17,11 @@ public class Nexus {
     private static final Interpreter interpreter = new Interpreter();
 
     public static void main(String[] args) throws IOException {
+        // Ensure source files and program output are handled as UTF-8,
+        // regardless of the platform's default charset.
+        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+        System.setErr(new PrintStream(System.err, true, StandardCharsets.UTF_8));
+
         if (args.length > 1) {
             System.out.println("Usage: nexus [script]");
             System.exit(64);
@@ -28,13 +34,14 @@ public class Nexus {
 
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, StandardCharsets.UTF_8));
         if (hadError) System.exit(65);
         if (hadRuntimeError) System.exit(70);
     }
 
     private static void runPrompt() throws IOException {
-        InputStreamReader input = new InputStreamReader(System.in);
+        InputStreamReader input =
+                new InputStreamReader(System.in, StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
