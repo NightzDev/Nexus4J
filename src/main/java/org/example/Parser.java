@@ -11,6 +11,7 @@ class Parser {
 
     private final List<Token> tokens;
     private int current = 0;
+    private int loopDepth = 0;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -68,6 +69,8 @@ class Parser {
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(WHILE)) return whileStatement();
+        if (match(BREAK)) return breakStatement();
+        if (match(CONTINUE)) return continueStatement();
 
         return expressionStatement();
     }
@@ -95,23 +98,28 @@ class Parser {
             increment = expression();
         }
         consume(RIGHT_PAREN, "Expect ')' after for clauses.");
-        Stmt body = statement();
 
-        if (increment != null) {
-            body = new Stmt.Block(
-                    Arrays.asList(
-                            body,
-                            new Stmt.Expression(increment)));
+        loopDepth++;
+        Stmt body;
+        try {
+            body = statement();
+        } finally {
+            loopDepth--;
         }
+
+        // The increment is kept separate (not embedded in the body) so that
+        // `continue` still runs it before the next iteration.
+        Stmt incrementStmt = (increment != null)
+                ? new Stmt.Expression(increment) : null;
 
         if (condition == null) condition = new Expr.Literal(true);
-        body = new Stmt.While(condition, body);
+        Stmt loop = new Stmt.While(condition, body, incrementStmt);
 
         if (initializer != null) {
-            body = new Stmt.Block(Arrays.asList(initializer, body));
+            loop = new Stmt.Block(Arrays.asList(initializer, loop));
         }
 
-        return body;
+        return loop;
     }
 
 
@@ -163,9 +171,34 @@ class Parser {
         consume(LEFT_PAREN, "Expect '(' after 'while'.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expect ')' after condition.");
-        Stmt body = statement();
 
-        return new Stmt.While(condition, body);
+        loopDepth++;
+        Stmt body;
+        try {
+            body = statement();
+        } finally {
+            loopDepth--;
+        }
+
+        return new Stmt.While(condition, body, null);
+    }
+
+    private Stmt breakStatement() {
+        Token keyword = previous();
+        if (loopDepth == 0) {
+            error(keyword, "Can't use 'break' outside of a loop.");
+        }
+        consume(SEMICOLON, "Expect ';' after 'break'.");
+        return new Stmt.Break(keyword);
+    }
+
+    private Stmt continueStatement() {
+        Token keyword = previous();
+        if (loopDepth == 0) {
+            error(keyword, "Can't use 'continue' outside of a loop.");
+        }
+        consume(SEMICOLON, "Expect ';' after 'continue'.");
+        return new Stmt.Continue(keyword);
     }
 
     private Stmt expressionStatement() {
@@ -190,7 +223,14 @@ class Parser {
         }
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
         consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-        List<Stmt> body = block();
+        int enclosingLoopDepth = loopDepth;
+        loopDepth = 0;
+        List<Stmt> body;
+        try {
+            body = block();
+        } finally {
+            loopDepth = enclosingLoopDepth;
+        }
         return new Stmt.Function(name, parameters, body);
     }
 

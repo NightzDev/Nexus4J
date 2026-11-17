@@ -42,9 +42,9 @@ NUMBER       inteiros ou decimais (sempre armazenados como double)
 ### Palavras-chave
 
 ```
-and    class   else    false   fun     for
-if     nil     or      print   return  super
-this   true    var     while
+and    break   class    continue  else    false
+fun    for     if       nil       or      print
+return super   this     true      var     while
 ```
 
 A correspondência entre texto e palavra-chave é feita pela tabela `keywords`
@@ -104,7 +104,9 @@ statement      → exprStmt
                | block
                | ifStmt
                | whileStmt
-               | forStmt ;
+               | forStmt
+               | breakStmt
+               | continueStmt ;
 
 exprStmt       → expression ";" ;
 
@@ -122,6 +124,10 @@ whileStmt      → "while" "(" expression ")" statement ;
 forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
                            expression? ";"
                            expression? ")" statement ;
+
+breakStmt      → "break" ";" ;
+
+continueStmt   → "continue" ";" ;
 ```
 
 > O `forStmt` é convertido pelo parser em um `whileStmt` equivalente

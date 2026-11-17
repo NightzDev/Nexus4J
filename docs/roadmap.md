@@ -44,7 +44,8 @@ Em ordem sugerida de implementação (do mais impactante ao complementar):
   - [ ] Matemática (`sqrt`, `abs`, `floor`, `ceil`, ...).
   - [ ] Conversões de tipo (`str`, `num`).
 - [ ] **Operador de módulo `%`** (e, opcionalmente, divisão inteira).
-- [ ] **`break` e `continue`** em laços `while`/`for`.
+- [x] **`break` e `continue`** em laços `while`/`for` (com verificação estática
+  de uso fora de laço). Veja `examples/break_continue.nxs`.
 - [ ] **Escapes em strings** (`\n`, `\t`, `\"`, `\\`).
 - [ ] **Comparação de strings** com `<`, `>`, `<=`, `>=` (hoje só números).
 - [ ] **Comentários de bloco** `/* ... */`.
@@ -71,5 +72,5 @@ Em ordem sugerida de implementação (do mais impactante ao complementar):
 | Nível | Objetivo | Estado |
 |-------|----------|--------|
 | 1 | Igualar e consertar a base do livro | ✅ Concluído |
-| 2 | Virar linguagem usável de verdade | 🟡 Em andamento (listas + `len`/`append`/`remove` prontos; faltam mapas, mais stdlib, `break`/`continue`) |
+| 2 | Virar linguagem usável de verdade | 🟡 Em andamento (listas, `len`/`append`/`remove` e `break`/`continue` prontos; faltam mapas, mais stdlib, `%`, escapes) |
 | 3 | Qualidade, build e automação | ⬜ Pendente |

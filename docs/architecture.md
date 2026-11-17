@@ -66,7 +66,8 @@ execução); a quarta é a execução propriamente dita.
   `IndexSet` é a atribuição `l[i] = v`.)
 - **`Stmt.java`** define os nós de **comando/declaração** da AST. Subclasses:
   `Block`, `Class`, `Expression`, `If`, `Function`, `Print`, `Return`, `Var`,
-  `While`.
+  `While`, `Break`, `Continue`. (O nó `While` carrega um campo `increment`
+  opcional, usado pelo `for` para que `continue` ainda execute o incremento.)
 
 Tanto `Expr` quanto `Stmt` usam o **padrão Visitor**: cada nó tem um método
 `accept(Visitor)`, e os "consumidores" da AST (Resolver, Interpreter, AstPrinter)
@@ -125,6 +126,9 @@ O runtime é apoiado por várias classes:
 - **`Return.java`** é uma exceção (sem stack trace) usada como mecanismo de
   controle de fluxo para implementar o comando `return`: ela "desenrola" a pilha
   de chamadas até a função que está executando.
+- **`BreakException.java`** e **`ContinueException.java`** seguem a mesma ideia
+  para `break` e `continue`: são lançadas pelos respectivos comandos e capturadas
+  pelo laço (`visitWhileStmt`) mais próximo.
 - **`RuntimeError.java`** é a exceção de erros em tempo de execução; carrega o
   `Token` onde o erro ocorreu, para informar a linha.
 
@@ -179,14 +183,15 @@ recursos além do livro. Já implementado:
 
 - **Listas** com literais `[...]`, indexação para leitura/escrita e as funções
   nativas `len`, `append` e `remove`.
+- **`break` e `continue`** em laços, com verificação estática de uso fora de laço.
 
 Ainda pendente:
 
 - **Mapas / dicionários** e demais coleções.
 - **Biblioteca padrão** mais ampla (além de `clock` e das funções de lista):
   entrada do usuário, funções de string, matemática, conversões de tipo.
-- **`break` / `continue`**, operador de módulo `%`, escapes em strings
-  (`\n`, `\t`, `\"`) e comentários de bloco.
+- **Operador de módulo `%`**, escapes em strings (`\n`, `\t`, `\"`) e
+  comentários de bloco.
 - **Testes automatizados** e empacotamento em um JAR executável.
 
 Veja o [roadmap.md](roadmap.md) para a lista completa e a ordem sugerida.

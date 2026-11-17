@@ -154,7 +154,31 @@ Internamente, o `for` é "açúcar sintático": o parser o transforma em um `whi
 com inicializador e incremento (ver `forStatement` em `Parser.java`). Todas as
 três cláusulas (inicializador, condição, incremento) são opcionais.
 
-> Não existem comandos `break` ou `continue` na linguagem.
+### `break` e `continue`
+
+Dentro de laços `while` e `for`:
+
+- **`break`** interrompe o laço imediatamente.
+- **`continue`** pula para a próxima iteração.
+
+```nexus
+for (var i = 0; i < 10; i = i + 1) {
+  if (i == 5) break;      // para quando chega em 5
+  if (i == 2) continue;   // pula o 2
+  print i;                // 0, 1, 3, 4
+}
+```
+
+Detalhes importantes:
+
+- Em um `for`, o `continue` **ainda executa o incremento** antes de reavaliar a
+  condição — ou seja, não causa laço infinito.
+- `break` e `continue` afetam apenas o **laço mais interno** em que estão.
+- Usá-los **fora de um laço** é um erro estático: *"Can't use 'break' outside of
+  a loop."* O mesmo vale dentro de uma função declarada dentro de um laço — a
+  fronteira da função "corta" o laço, então `break`/`continue` ali também são erro.
+
+> Exemplo completo em `examples/break_continue.nxs`.
 
 ## Blocos e escopo
 
