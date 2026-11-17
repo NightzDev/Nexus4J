@@ -1,7 +1,5 @@
 package org.example;
 
-import com.sun.tools.javac.Main;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +101,7 @@ class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    //Nexus.error(line, "Unexpected character.");
+                    Nexus.error(line, "Unexpected character.");
                 }
         }
     }
@@ -138,7 +136,7 @@ class Scanner {
         }
 
         if (isAtEnd()) {
-            //Nexus.error(line, "Unterminated string.");
+            Nexus.error(line, "Unterminated string.");
             return;
         }
 

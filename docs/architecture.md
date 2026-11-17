@@ -49,9 +49,8 @@ execução); a quarta é a execução propriamente dita.
   (texto original), o valor literal (para números e strings) e a linha.
 - **`TokenType.java`** é o enum com todos os tipos de token possíveis.
 
-> Detalhe: `Scanner.java` possui um `import com.sun.tools.javac.Main;` que **não
-> é usado** e pode ser removido sem efeito (ver
-> [observações](#observações-e-pontos-de-atenção)).
+> O scanner reporta erros léxicos (caractere inesperado e string não terminada)
+> por meio de `Nexus.error(int line, String message)`.
 
 ### 2. Análise sintática — `Parser`, `Expr`, `Stmt`
 
@@ -153,12 +152,14 @@ descreve-se cada tipo de nó em uma única linha, por exemplo:
 
 e o `GenerateAst` emite o arquivo Java completo, incluindo a interface `Visitor`.
 
-> **Limitações de uso da ferramenta:**
-> - O diretório de saída está **fixo no código** (`outputDir`) apontando para um
->   caminho Windows específico do desenvolvedor original. Para regenerar os
->   arquivos em outra máquina, é preciso editar essa variável.
-> - É uma ferramenta de *build-time*; não é chamada durante a execução do
->   interpretador.
+O diretório de saída é passado como argumento de linha de comando, por exemplo:
+
+```bash
+java -cp target/classes org.example.tools.GenerateAst src/main/java/org/example
+```
+
+> É uma ferramenta de *build-time*; não é chamada durante a execução do
+> interpretador.
 
 ## O padrão Visitor em uma frase
 
@@ -169,30 +170,16 @@ operações sobre a árvore sem tocar nas classes dos nós.
 
 ## Observações e pontos de atenção
 
-Alguns pontos úteis para quem for manter o projeto:
+O que falta para a linguagem evoluir está organizado em uma lista priorizada no
+[roadmap.md](roadmap.md). Em resumo, como implementação no estilo *jlox* a
+linguagem está completa; o que falta para ser uma linguagem de uso real são
+recursos além do livro:
 
-1. **`Expr.java` duplicado na raiz.** Existe um `Expr.java` na raiz do
-   repositório que declara `package org.example.Nexus;` e contém apenas uma
-   versão antiga e incompleta da hierarquia de expressões (`Binary`, `Grouping`,
-   `Literal`, `Unary`). Ele **não** é o arquivo usado pelo interpretador — o
-   verdadeiro é `src/main/java/org/example/Expr.java`. O arquivo da raiz é um
-   resquício e pode ser ignorado/removido.
+- **Coleções** (listas e mapas) — a maior limitação atual.
+- **Biblioteca padrão** mais ampla (além de `clock`): entrada do usuário,
+  funções de string, matemática, conversões de tipo.
+- **`break` / `continue`**, operador de módulo `%`, escapes em strings
+  (`\n`, `\t`, `\"`) e comentários de bloco.
+- **Testes automatizados** e empacotamento em um JAR executável.
 
-2. **Import não usado em `Scanner.java`.** A linha
-   `import com.sun.tools.javac.Main;` não tem nenhum uso e refere-se a uma API
-   interna do compilador. Pode ser removida com segurança e, em alguns
-   ambientes, isso evita problemas de compilação.
-
-3. **Mensagens de erro do scanner comentadas.** No `Scanner`, as chamadas a
-   `Nexus.error(...)` para "caractere inesperado" e "string não terminada" estão
-   comentadas. Isso significa que caracteres inválidos são silenciosamente
-   ignorados e strings não fechadas não geram erro léxico explícito.
-
-4. **Mensagem "Usage: jlox [script]".** O texto de uso ainda menciona `jlox`
-   (nome da implementação de referência no livro), e não `Nexus`.
-
-5. **`GenerateAst` com caminho fixo de Windows.** Conforme descrito acima, a
-   ferramenta precisa de ajuste de caminho para rodar fora da máquina original.
-
-Nenhum desses pontos impede o interpretador de funcionar; são apenas detalhes a
-considerar em uma futura limpeza do código.
+Veja o [roadmap.md](roadmap.md) para a lista completa e a ordem sugerida.

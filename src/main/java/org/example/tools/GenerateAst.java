@@ -7,11 +7,11 @@ import java.util.List;
 
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
-        //if (args.length != 1) {
-        //    System.err.println("Usage: generate_ast <output directory>");
-        //    System.exit(64);
-        //}
-        String outputDir = "C:\\Users\\yurih\\Documents\\A2\\Event\\src\\main\\java\\org\\example\\";
+        if (args.length != 1) {
+            System.err.println("Usage: generate_ast <output directory>");
+            System.exit(64);
+        }
+        String outputDir = args[0];
         defineAst(outputDir, "Expr", Arrays.asList(
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",

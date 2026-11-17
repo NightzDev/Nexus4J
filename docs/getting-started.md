@@ -24,12 +24,6 @@ mvn compile
 
 Isso compila todas as classes Java para `target/classes`.
 
-> **Atenção:** o `Scanner.java` contém um `import com.sun.tools.javac.Main;`
-> que não é utilizado. Dependendo do ambiente/JDK, esse import interno do
-> compilador pode não estar acessível. Caso a compilação falhe por causa dele,
-> remova a linha `import com.sun.tools.javac.Main;` do início de
-> `src/main/java/org/example/Scanner.java` — ela é inofensiva e não tem uso real.
-
 ## Executando
 
 A classe principal é `org.example.Nexus`. Ela tem dois modos de uso, decididos
@@ -101,9 +95,10 @@ os arquivos `Expr.java` e `Stmt.java` (as classes de nós da AST). Ela **não fa
 parte da execução do interpretador** — é usada apenas durante o desenvolvimento
 para regenerar essas classes a partir de uma descrição compacta.
 
-> **Aviso:** o caminho de saída está fixo (*hardcoded*) para um diretório
-> Windows específico dentro do código:
-> `String outputDir = "C:\\Users\\yurih\\Documents\\A2\\Event\\src\\main\\java\\org\\example\\";`
-> Para usá-la em outra máquina, é preciso ajustar essa variável `outputDir`
-> para o caminho correto antes de rodar. Veja
-> [architecture.md](architecture.md#geração-de-código-da-ast) para detalhes.
+Ela recebe o diretório de saída como argumento de linha de comando:
+
+```bash
+java -cp target/classes org.example.tools.GenerateAst src/main/java/org/example
+```
+
+Veja [architecture.md](architecture.md#geração-de-código-da-ast) para detalhes.

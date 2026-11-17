@@ -22,6 +22,7 @@ Nexus é uma linguagem:
 | [language-guide.md](language-guide.md) | Guia completo da linguagem Nexus: tipos, variáveis, controle de fluxo, funções, classes. |
 | [grammar.md](grammar.md) | Gramática formal da linguagem e lista de tokens. |
 | [architecture.md](architecture.md) | Arquitetura interna: pipeline do interpretador e papel de cada classe Java. |
+| [roadmap.md](roadmap.md) | O que falta para a linguagem evoluir, em níveis de prioridade. |
 
 ---
 
@@ -87,7 +88,6 @@ Cada uma dessas etapas é detalhada em [architecture.md](architecture.md).
 ```
 Nexus4J/
 ├── pom.xml                       # Configuração Maven (Java 21)
-├── Expr.java                     # Arquivo legado na raiz (ver nota abaixo)
 ├── docs/                         # Esta documentação
 └── src/main/java/org/example/
     ├── Nexus.java                # Ponto de entrada (main): REPL e execução de arquivos
@@ -112,8 +112,5 @@ Nexus4J/
         └── GenerateAst.java      # Gerador de código das classes Expr e Stmt
 ```
 
-> **Nota sobre `Expr.java` na raiz:** há um arquivo `Expr.java` na raiz do
-> repositório que pertence a um pacote diferente (`org.example.Nexus`) e é um
-> resquício antigo, incompleto, do desenvolvimento. O arquivo realmente usado
-> pelo interpretador é `src/main/java/org/example/Expr.java`. Veja
-> [architecture.md](architecture.md#observações-e-pontos-de-atenção) para mais detalhes.
+> Para o que ainda falta na linguagem (coleções, biblioteca padrão,
+> `break`/`continue` etc.), veja o [roadmap.md](roadmap.md).

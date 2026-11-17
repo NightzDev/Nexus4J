@@ -17,7 +17,7 @@ public class Nexus {
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.out.println("Usage: jlox [script]");
+            System.out.println("Usage: nexus [script]");
             System.exit(64);
         } else if (args.length == 1) {
             runFile(args[0]);
@@ -58,6 +58,10 @@ public class Nexus {
         resolver.resolve(statements);
         if (hadError) return;
         interpreter.interpret(statements);
+    }
+
+    static void error(int line, String message) {
+        report(line, "", message);
     }
 
     static void error(Token token, String message) {
